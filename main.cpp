@@ -25,7 +25,7 @@ int main()
     std::string pos;
     while (std::getline(std::cin, pos))
     {
-        if(tolower(pos.front())=='q'){
+        if(!pos.empty()&&tolower(pos.front())=='q'){
             break;
         }
         std::cout<<"You Clicked the Position:"<<pos<<std::endl;

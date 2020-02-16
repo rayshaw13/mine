@@ -7,9 +7,6 @@
 #include "wchar.h"
 #include <map>
 
-map<char,wchar_t> mp;
-
-
 
 MineMap::MineMap(int h, int w, int num):
     height(h),width(w),mineNum(num),recovered(0)
@@ -17,11 +14,6 @@ MineMap::MineMap(int h, int w, int num):
     vector<char> tmp(width,'E');
     mineMap.assign(height, tmp);
     GenerateMap();
-    mp['1']=L'①';
-    for(int i=1;i<=9;i++)
-    {
-        mp['1'+i]=L'①'+i;
-    }
 }
 
 MineMap::~MineMap()
@@ -67,19 +59,17 @@ void MineMap::PrintMap()
         printf("%*d|",posnum,i);
         for (size_t j = 0; j < mineMap[i].size(); j++)
         {
-            wchar_t *wstr;
-            wstr=(wchar_t*)malloc(1*sizeof(wchar_t));
-            mbstowcs(wstr,&mineMap[i][j],1);
+            char str;
             if(mineMap[i][j]=='M'||mineMap[i][j]=='E') {
-                wstr=L"口";
+                str='E';
             }else if(mineMap[i][j]=='B') {
-                wstr=L"〇";
+                str='B';
             }else
             {
-                wstr=&mp[mineMap[i][j]];
+                str=mineMap[i][j];
             }
             
-            wprintf(L"%ls",wstr);
+            printf("%2c",str);
         }
         std::cout << std::endl;
     }
