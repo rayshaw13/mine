@@ -1,6 +1,7 @@
 #ifndef MINE_MAP
 #define MINE_MAP
 #include <vector>
+#include <set>
 using namespace std;
 
 class MineMap
@@ -14,7 +15,7 @@ private:
     int mineNum;
     int height;
     int width;
-    int recovered;
+    set<pair<int,int>> recovered;
 
     bool IsValid(const vector<vector<char>> &board, const vector<int>& point)
     {

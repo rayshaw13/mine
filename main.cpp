@@ -18,8 +18,8 @@ int main()
     std::cin>>num;
     auto m = make_shared<MineMap>(height,width,num);
     std::cin.clear();
-    std::cin.sync();
-    // std::cin.ignore();
+    //std::cin.sync();
+     std::cin.ignore();
     Player pl(m);
     Juger jl(m);
     std::string pos;

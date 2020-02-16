@@ -9,7 +9,7 @@
 
 
 MineMap::MineMap(int h, int w, int num):
-    height(h),width(w),mineNum(num),recovered(0)
+    height(h),width(w),mineNum(num)
 {
     vector<char> tmp(width,'E');
     mineMap.assign(height, tmp);
@@ -101,14 +101,14 @@ int MineMap::RecoverOnClick(const vector<int> &click)
     if (arr > 0)
     {
         mineMap[click[0]][click[1]] = arr + '0';
-        recovered++;
+        recovered.insert(make_pair(click[0],click[1]));
         return 0;
     }
     stack<vector<int>> st;
     if (arr == 0)
     {
         mineMap[click[0]][click[1]] = 'B';
-        recovered++;
+        recovered.insert(make_pair(click[0], click[1]));
         st.push(click);
         while (!st.empty())
         {
@@ -125,12 +125,12 @@ int MineMap::RecoverOnClick(const vector<int> &click)
                     if (arrtmp > 0)
                     {
                         mineMap[nextClick[0]][nextClick[1]] = arrtmp + '0';
-                        recovered++;
+                        recovered.insert(make_pair(nextClick[0], nextClick[1]));
                     }
                     else if (arrtmp == 0)
                     {
                         mineMap[nextClick[0]][nextClick[1]] = 'B';
-                        recovered++;
+                        recovered.insert(make_pair(nextClick[0], nextClick[1]));
                         st.push(nextClick);
                     }
                 }
@@ -142,7 +142,7 @@ int MineMap::RecoverOnClick(const vector<int> &click)
 
 int MineMap::GetRecovered()
 {
-    return recovered;
+    return recovered.size();
 }
 int MineMap::GetHeight()
 {
