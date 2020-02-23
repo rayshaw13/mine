@@ -1,6 +1,7 @@
 #ifndef MINE_MAP
 #define MINE_MAP
 #include <vector>
+#include <set>
 using namespace std;
 
 class MineMap
@@ -12,9 +13,15 @@ private:
     // 'X' 则表示一个已挖出的地雷。
     vector<vector<char>> mineMap;
     int mineNum;
+    int height;
+    int width;
+    set<pair<int,int>> recovered;
 
     bool IsValid(const vector<vector<char>> &board, const vector<int>& point)
     {
+        if(point.size()<2){
+            return false;
+        }
         if(point[0]>=0&&point[0]<board.size()&&point[1]>=0&&point[1]<board[0].size()) {
             return true;
         }
@@ -50,5 +57,12 @@ public:
     void SetRedFlag(const vector<int> &click);
 
     void PrintMap();
+
+    void PrintMapAll();
+
+    int GetRecovered();
+    int GetHeight();
+    int GetWidth();
+    int GetMineNum();
 };
 #endif
