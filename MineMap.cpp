@@ -7,6 +7,8 @@
 #include "wchar.h"
 #include <map>
 
+vector<vector<int>> MineMap::directions={{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}};
+
 
 MineMap::MineMap(int h, int w, int num):
     height(h),width(w),mineNum(num)
@@ -155,4 +157,33 @@ int MineMap::GetWidth()
 int MineMap::GetMineNum()
 {
     return mineNum;
+}
+
+inline bool MineMap::IsValid(const vector<vector<char>> &board, const vector<int> &point)
+{
+    if (point.size() < 2)
+    {
+        return false;
+    }
+    if (point[0] >= 0 && point[0] < board.size() && point[1] >= 0 && point[1] < board[0].size())
+    {
+        return true;
+    }
+    return false;
+}
+
+inline int MineMap::Arround(vector<vector<char>> &board, const vector<int> &point, char target)
+{
+    int res = 0;
+    for (auto &dirc : directions)
+    {
+        auto nextPoint = point;
+        nextPoint[0] = point[0] + dirc[0];
+        nextPoint[1] = point[1] + dirc[1];
+        if (IsValid(board, nextPoint) && board[nextPoint[0]][nextPoint[1]] == target)
+        {
+            res++;
+        }
+    }
+    return res;
 }

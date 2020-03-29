@@ -17,32 +17,11 @@ private:
     int width;
     set<pair<int,int>> recovered;
 
-    bool IsValid(const vector<vector<char>> &board, const vector<int>& point)
-    {
-        if(point.size()<2){
-            return false;
-        }
-        if(point[0]>=0&&point[0]<board.size()&&point[1]>=0&&point[1]<board[0].size()) {
-            return true;
-        }
-        return false;
-    }
-    int Arround(vector<vector<char>> &board, const vector<int>& point, char target)
-    {
-        int res=0;
-        for(auto& dirc:directions) {
-            auto nextPoint=point;
-            nextPoint[0]=point[0]+dirc[0];
-            nextPoint[1]=point[1]+dirc[1];
-            if (IsValid(board,  nextPoint) && board[nextPoint[0]][nextPoint[1]]==target)
-            {
-                res++;
-            }
-            
-        }
-        return res;
-    }
-    vector<vector<int>> directions{{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}};
+    bool IsValid(const vector<vector<char>> &board, const vector<int> &point);
+
+    int Arround(vector<vector<char>> &board, const vector<int> &point, char target);
+
+    static vector<vector<int>> directions;
 public:
     explicit MineMap(int height, int width, int num);
     ~MineMap();

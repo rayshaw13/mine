@@ -6,6 +6,7 @@
 #include "Juger.h"
 #include "glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
+#include "cursor.h"
 // #include <locale.h>
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -34,7 +35,7 @@ int main()
     GLFWwindow *window = glfwCreateWindow(800, 600, "mine", NULL, NULL);
     if (window == NULL)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        std::cout << "Failed to create mine window" << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -48,7 +49,8 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }    
-
+    //
+    Cursor cursor(window);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
