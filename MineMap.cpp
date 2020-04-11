@@ -11,9 +11,9 @@ vector<vector<int>> MineMap::directions={{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},
 
 
 MineMap::MineMap(int h, int w, int num):
-    height(h),width(w),mineNum(num)
+    height(h),width(w),mineNum(num),isBloom(false)
 {
-    vector<char> tmp(width,'E');
+    vector<char> tmp(width,'U');
     mineMap.assign(height, tmp);
     GenerateMap();
 }
@@ -62,8 +62,8 @@ void MineMap::PrintMap()
         for (size_t j = 0; j < mineMap[i].size(); j++)
         {
             char str;
-            if(mineMap[i][j]=='M'||mineMap[i][j]=='E') {
-                str='E';
+            if(mineMap[i][j]=='M'||mineMap[i][j]=='U') {
+                str='U';
             }else if(mineMap[i][j]=='B') {
                 str='B';
             }else
@@ -97,6 +97,7 @@ int MineMap::RecoverOnClick(const vector<int> &click)
     if (mineMap[click[0]][click[1]] == 'M')
     {
         mineMap[click[0]][click[1]] = 'X';
+        isBloom = true;
         return -1;
     }
     int arr = Arround(mineMap, click, 'M');
@@ -121,7 +122,7 @@ int MineMap::RecoverOnClick(const vector<int> &click)
                 auto nextClick = p;
                 nextClick[0] = p[0] + dirc[0];
                 nextClick[1] = p[1] + dirc[1];
-                if (IsValid(mineMap, nextClick) && mineMap[nextClick[0]][nextClick[1]] == 'E')
+                if (IsValid(mineMap, nextClick) && mineMap[nextClick[0]][nextClick[1]] == 'U')
                 {
                     int arrtmp = Arround(mineMap, nextClick, 'M');
                     if (arrtmp > 0)
@@ -146,17 +147,21 @@ int MineMap::GetRecovered()
 {
     return recovered.size();
 }
-int MineMap::GetHeight()
+int MineMap::GetRows()
 {
     return height;
 }
-int MineMap::GetWidth()
+int MineMap::GetColums()
 {
     return width;
 }
 int MineMap::GetMineNum()
 {
     return mineNum;
+}
+bool MineMap::IsBloomed()
+{
+    return isBloom;
 }
 
 inline bool MineMap::IsValid(const vector<vector<char>> &board, const vector<int> &point)

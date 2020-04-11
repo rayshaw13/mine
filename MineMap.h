@@ -15,6 +15,7 @@ private:
     int mineNum;
     int height;
     int width;
+    bool isBloom;
     set<pair<int,int>> recovered;
 
     bool IsValid(const vector<vector<char>> &board, const vector<int> &point);
@@ -40,8 +41,9 @@ public:
     void PrintMapAll();
 
     int GetRecovered();
-    int GetHeight();
-    int GetWidth();
+    int GetRows();
+    int GetColums();
     int GetMineNum();
+    bool IsBloomed();
 };
 #endif

@@ -2,11 +2,11 @@
 #include <string>
 #include <sstream>
 #include "MineMap.h"
-#include "player.h"
-#include "Juger.h"
+#include "roles.h"
 #include "glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
-#include "cursor.h"
+#include "display.h"
+#include "elements.h"
 // #include <locale.h>
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -24,6 +24,20 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+    {
+        double xpos, ypos;
+        //getting cursor position
+        glfwGetCursorPos(window, &xpos, &ypos);
+        std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
+        auto roles = static_cast<Roles *>(glfwGetWindowUserPointer(window));
+        roles->player->SingleLeftClick(window, xpos, ypos);
+        roles->juger->DoJuge();
+    }
 }
 
 int main()
@@ -50,7 +64,16 @@ int main()
         return -1;
     }    
     //
-    Cursor cursor(window);
+    auto minemap = std::make_shared<MineMap>(10, 10, 10);
+    auto player = std::make_shared<Player>(minemap);
+    auto juger = std::make_shared<Juger>(minemap);
+    Roles roles;
+    roles.player = player;
+    roles.juger = juger;
+    glfwSetWindowUserPointer(window, &roles);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+    Display displayer(window, minemap);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -63,52 +86,20 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        displayer.Update();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+        if(minemap->IsBloomed()) {
+            break;
+        }
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+    getchar();
     return 0;
-    // // setlocale(LC_CTYPE,"");
-    // int height,width,num;
-    // std::cout<<"Plz input minemap's height:";
-    // std::cin>>height;
-    // std::cout<<"Plz input minemap's width:";
-    // std::cin>>width;
-    // std::cout<<"Plz input mine number:";
-    // std::cin>>num;
-    // auto m = make_shared<MineMap>(height,width,num);
-    // std::cin.clear();
-    // //std::cin.sync();
-    //  std::cin.ignore();
-    // Player pl(m);
-    // Juger jl(m);
-    // std::string pos;
-    // while (std::getline(std::cin, pos))
-    // {
-    //     if(!pos.empty()&&tolower(pos.front())=='q'){
-    //         break;
-    //     }
-    //     std::cout<<"You Clicked the Position:"<<pos<<std::endl;
-    //     istringstream poss(pos);
-    //     int x,y;
-    //     poss>>x>>y;
-    //     std::vector<int> click{x,y};
-    //     int ret = pl.SingleLeftClick(click);
-    //     if(ret==-1) {
-    //         break;
-    //     }
-    //     ret = jl.DoJuge();
-    //     if(ret == 1) {
-    //         break;
-    //     }
-    // }
-    // getchar();
-    
-    // return 0;
 }
