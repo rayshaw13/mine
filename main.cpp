@@ -36,6 +36,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
         auto roles = static_cast<Roles *>(glfwGetWindowUserPointer(window));
         roles->player->SingleLeftClick(window, xpos, ypos);
+        roles->displayer->UpdateDrawing();
         roles->juger->DoJuge();
     }
 }
@@ -46,7 +47,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow *window = glfwCreateWindow(800, 600, "mine", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(600, 600, "mine", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create mine window" << std::endl;
@@ -67,13 +68,14 @@ int main()
     auto minemap = std::make_shared<MineMap>(10, 10, 10);
     auto player = std::make_shared<Player>(minemap);
     auto juger = std::make_shared<Juger>(minemap);
-    Roles roles;
-    roles.player = player;
-    roles.juger = juger;
-    glfwSetWindowUserPointer(window, &roles);
+    auto displayer = std::make_shared<Display>(window, minemap);
+    auto roles = std::make_unique<Roles>();
+    roles->player = player;
+    roles->juger = juger;
+    roles->displayer = displayer;
+    glfwSetWindowUserPointer(window, roles.get());
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-    Display displayer(window, minemap);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -86,7 +88,7 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        displayer.Update();
+        displayer->Update();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -100,6 +102,6 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
-    getchar();
+    // getchar();
     return 0;
 }

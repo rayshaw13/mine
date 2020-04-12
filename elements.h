@@ -1,12 +1,12 @@
 #ifndef ELEMENTS
 #define ELEMENTS
+#include <vector>
 #include <glm/glm.hpp>
-struct blocks
+struct Block
 {
-    glm::vec3 lefttop;
-    glm::vec3 righttop;
-    glm::vec3 rightbottom;
-    glm::vec3 leftbottom;
+    vector<glm::vec3> position;
+    vector<glm::vec3> color;
+    vector<glm::vec2> textue;
 };
 
 
