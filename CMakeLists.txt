@@ -1,2 +1,30 @@
+cmake_minimum_required(VERSION 3.0)
+project(mine VERSION 1.0)
+
+set(glfw3_DIR ${CMAKE_SOURCE_DIR}/../deps/glfw/build/install/lib/cmake/glfw3)
+find_package(glfw3 REQUIRED)
+if (NOT glfw3_FOUND)
+    message("not found glfw, plz set glfw3_DIR")
+endif (NOT glfw3_FOUND)
+# 打印所有变量
+# get_cmake_property(_variableNames VARIABLES)
+# foreach (_variableName ${_variableNames})
+#     message(STATUS "${_variableName}=${${_variableName}}")
+# endforeach()
+
+include_directories(${glfw3_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/../deps/glm)
+include_directories(.)
+include_directories(./glad/include)
 aux_source_directory(. SRC)
-add_executable(mine ${SRC})
+aux_source_directory(./glad/src SRC)
+if (WIN32)
+    add_executable(mine  ${SRC})
+elseif()
+    add_executable(mine ${SRC})
+endif(WIN32)
+
+target_link_libraries(mine glfw)
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
+install(FILES texture.fs texture.vs res/container.jpg DESTINATION res)

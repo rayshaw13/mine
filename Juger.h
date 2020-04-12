@@ -9,11 +9,13 @@ class Juger
 private:
     shared_ptr<MineMap> mine;
     int lastmine;
+    int m_win;
 public:
     Juger(shared_ptr<MineMap> m);
     ~Juger();
 
     int DoJuge();
+    int GetGameState();
 };
 
 #endif

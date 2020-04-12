@@ -7,12 +7,14 @@
 #include "wchar.h"
 #include <map>
 
+vector<vector<int>> MineMap::directions={{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}};
+
 
 MineMap::MineMap(int h, int w, int num):
-    height(h),width(w),mineNum(num)
+    rows(h),colums(w),mineNum(num),isBloom(false)
 {
-    vector<char> tmp(width,'E');
-    mineMap.assign(height, tmp);
+    vector<char> tmp(colums,MineSymbol::UNRECOVERED);
+    mineMap.assign(rows, tmp);
     GenerateMap();
 }
 
@@ -29,7 +31,7 @@ void MineMap::GenerateMap()
         int ran = rand()%len;
         int ranHeight = ran / mineMap[0].size();
         int ranWidth = ran % mineMap.size();
-        mineMap[ranHeight][ranWidth] = 'M';
+        mineMap[ranHeight][ranWidth] = MineSymbol::MINECOVERED;
     }
     
 }
@@ -47,6 +49,7 @@ int GetPosNum(int num)
 }
 void MineMap::PrintMap()
 {
+    std::shared_lock<std::shared_timed_mutex> reader(m_protect);
     std::cout<<"_|";
     for(size_t i = 0; i < mineMap[0].size(); i++)
     {
@@ -60,10 +63,10 @@ void MineMap::PrintMap()
         for (size_t j = 0; j < mineMap[i].size(); j++)
         {
             char str;
-            if(mineMap[i][j]=='M'||mineMap[i][j]=='E') {
-                str='E';
-            }else if(mineMap[i][j]=='B') {
-                str='B';
+            if(mineMap[i][j]==MineSymbol::MINECOVERED||mineMap[i][j]==MineSymbol::UNRECOVERED) {
+                str=MineSymbol::UNRECOVERED;
+            }else if(mineMap[i][j]==MineSymbol::BLANK) {
+                str=MineSymbol::BLANK;
             }else
             {
                 str=mineMap[i][j];
@@ -76,6 +79,7 @@ void MineMap::PrintMap()
 }
 void MineMap::PrintMapAll()
 {
+    std::shared_lock<std::shared_timed_mutex> reader(m_protect);
     for (size_t i = 0; i < mineMap.size(); i++)
     {
         for (size_t j = 0; j < mineMap[i].size(); j++)
@@ -89,15 +93,17 @@ void MineMap::PrintMapAll()
 
 int MineMap::RecoverOnClick(const vector<int> &click)
 {
+    std::unique_lock<std::shared_timed_mutex> writer(m_protect);
     if(!IsValid(mineMap,click)) {
         return 1;
     }
-    if (mineMap[click[0]][click[1]] == 'M')
+    if (mineMap[click[0]][click[1]] == MineSymbol::MINECOVERED)
     {
-        mineMap[click[0]][click[1]] = 'X';
+        mineMap[click[0]][click[1]] = MineSymbol::MINEEXPLOSED;
+        isBloom = true;
         return -1;
     }
-    int arr = Arround(mineMap, click, 'M');
+    int arr = Arround(mineMap, click, MineSymbol::MINECOVERED);
     if (arr > 0)
     {
         mineMap[click[0]][click[1]] = arr + '0';
@@ -107,7 +113,7 @@ int MineMap::RecoverOnClick(const vector<int> &click)
     stack<vector<int>> st;
     if (arr == 0)
     {
-        mineMap[click[0]][click[1]] = 'B';
+        mineMap[click[0]][click[1]] = MineSymbol::BLANK;
         recovered.insert(make_pair(click[0], click[1]));
         st.push(click);
         while (!st.empty())
@@ -119,9 +125,9 @@ int MineMap::RecoverOnClick(const vector<int> &click)
                 auto nextClick = p;
                 nextClick[0] = p[0] + dirc[0];
                 nextClick[1] = p[1] + dirc[1];
-                if (IsValid(mineMap, nextClick) && mineMap[nextClick[0]][nextClick[1]] == 'E')
+                if (IsValid(mineMap, nextClick) && mineMap[nextClick[0]][nextClick[1]] == MineSymbol::UNRECOVERED)
                 {
-                    int arrtmp = Arround(mineMap, nextClick, 'M');
+                    int arrtmp = Arround(mineMap, nextClick, MineSymbol::MINECOVERED);
                     if (arrtmp > 0)
                     {
                         mineMap[nextClick[0]][nextClick[1]] = arrtmp + '0';
@@ -129,7 +135,7 @@ int MineMap::RecoverOnClick(const vector<int> &click)
                     }
                     else if (arrtmp == 0)
                     {
-                        mineMap[nextClick[0]][nextClick[1]] = 'B';
+                        mineMap[nextClick[0]][nextClick[1]] = MineSymbol::BLANK;
                         recovered.insert(make_pair(nextClick[0], nextClick[1]));
                         st.push(nextClick);
                     }
@@ -144,15 +150,54 @@ int MineMap::GetRecovered()
 {
     return recovered.size();
 }
-int MineMap::GetHeight()
+int MineMap::GetRows()
 {
-    return height;
+    return rows;
 }
-int MineMap::GetWidth()
+int MineMap::GetColums()
 {
-    return width;
+    return colums;
 }
 int MineMap::GetMineNum()
 {
     return mineNum;
+}
+bool MineMap::IsBloomed()
+{
+    return isBloom;
+}
+
+const vector<vector<char>>& MineMap::GetMineMap()
+{
+    std::shared_lock<std::shared_timed_mutex> reader(m_protect);
+    return mineMap;
+}
+
+inline bool MineMap::IsValid(const vector<vector<char>> &board, const vector<int> &point)
+{
+    if (point.size() < 2)
+    {
+        return false;
+    }
+    if (point[0] >= 0 && point[0] < board.size() && point[1] >= 0 && point[1] < board[0].size())
+    {
+        return true;
+    }
+    return false;
+}
+
+inline int MineMap::Arround(vector<vector<char>> &board, const vector<int> &point, char target)
+{
+    int res = 0;
+    for (auto &dirc : directions)
+    {
+        auto nextPoint = point;
+        nextPoint[0] = point[0] + dirc[0];
+        nextPoint[1] = point[1] + dirc[1];
+        if (IsValid(board, nextPoint) && board[nextPoint[0]][nextPoint[1]] == target)
+        {
+            res++;
+        }
+    }
+    return res;
 }
