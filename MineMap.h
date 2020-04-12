@@ -45,8 +45,8 @@ private:
     // 'X' 则表示一个已挖出的地雷。
     vector<vector<char>> mineMap;
     int mineNum;
-    int height;
-    int width;
+    int rows;
+    int colums;
     bool isBloom;
     set<pair<int,int>> recovered;
 

@@ -17,11 +17,11 @@ int Player::SingleLeftClick(GLFWwindow *window, double x, double y)
     glfwGetWindowSize(window, &width, &height);
     int rows = m_mineMap->GetRows();
     int colums = m_mineMap->GetColums();
-    int rindex = int(x/width*rows);
-    int cindex = int(y/height*colums);
-    std::cout<<"width:"<<width<<" rows:"<<rows<<" "<<x<<" "<<int(x/width*rows)<< std::endl;
-    std::cout<<"height:"<<height<<" cols:"<<colums<<" "<<y<<" "<<int(y/height*colums)<< std::endl;
-    vector<int> click{cindex,rindex};
+    int cindex = int(x/width*colums);
+    int rindex = int(y/height*rows);
+    std::cout<<"height:"<<height<<" rows:"<<rows<<" "<<y<<" "<<rindex<< std::endl;
+    std::cout<<"width:"<<width<<" cols:"<<colums<<" "<<x<<" "<<cindex<< std::endl;
+    vector<int> click{rindex,cindex};
     return SingleLeftClick(click);
 }
 

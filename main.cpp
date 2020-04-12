@@ -65,7 +65,7 @@ int main()
         return -1;
     }    
     //
-    auto minemap = std::make_shared<MineMap>(10, 10, 10);
+    auto minemap = std::make_shared<MineMap>(20, 30, 50);
     auto player = std::make_shared<Player>(minemap);
     auto juger = std::make_shared<Juger>(minemap);
     auto displayer = std::make_shared<Display>(window, minemap);

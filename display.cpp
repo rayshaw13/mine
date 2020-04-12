@@ -10,6 +10,8 @@ Display::Display(GLFWwindow* w, std::shared_ptr< MineMap> m):
     auto vertexShader=path+"texture.vs";
     auto fragmentShader=path+"texture.fs";
     m_shader = std::make_unique<Shader>(vertexShader, fragmentShader);
+    numBlocks = m_minemap->GetRows() * m_minemap->GetColums();
+    std::cout<<numBlocks<<std::endl;
     Init();
 }
 
@@ -17,7 +19,6 @@ void Display::Init()
 {
     float hlen = 2.0f/m_minemap->GetRows();
     float wlen = 2.0f/m_minemap->GetColums();
-    numBlocks = m_minemap->GetRows() * m_minemap->GetColums();
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     Block block;
@@ -66,9 +67,9 @@ void Display::Init()
     for (int i = 0; i < block_positions.size(); ++i){
         for (int j = 0; j < block_positions[i].size(); ++j){
             for (int k = 0; k < block_positions[i][j].size(); ++k){
-                positions[((i*10+j)*numVertices+k)*3] = block_positions[i][j][k].x;
-                positions[((i*10+j)*numVertices+k)*3+1] = block_positions[i][j][k].y;
-                positions[((i*10+j)*numVertices+k)*3+2] = block_positions[i][j][k].z;
+                positions[((i*m_minemap->GetColums()+j)*numVertices+k)*3] = block_positions[i][j][k].x;
+                positions[((i*m_minemap->GetColums()+j)*numVertices+k)*3+1] = block_positions[i][j][k].y;
+                positions[((i*m_minemap->GetColums()+j)*numVertices+k)*3+2] = block_positions[i][j][k].z;
             }
         }
     }
@@ -79,9 +80,9 @@ void Display::Init()
     for (int i = 0; i < block_colors.size(); ++i){
         for (int j = 0; j < block_colors[i].size(); ++j){
             for (int k = 0; k < block_colors[i][j].size(); ++k){
-                colors[((i*10+j)*numVertices+k)*3] = block_colors[i][j][k].r;
-                colors[((i*10+j)*numVertices+k)*3+1] = block_colors[i][j][k].g;
-                colors[((i*10+j)*numVertices+k)*3+2] = block_colors[i][j][k].b;
+                colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3] = block_colors[i][j][k].r;
+                colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3+1] = block_colors[i][j][k].g;
+                colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3+2] = block_colors[i][j][k].b;
             }
         }
     }
@@ -92,8 +93,8 @@ void Display::Init()
     for (int i = 0; i < block_textures.size(); ++i){
         for (int j = 0; j < block_textures[i].size(); ++j){
             for (int k = 0; k < block_textures[i][j].size(); ++k){
-                textures[((i*10+j)*numVertices+k)*2] = block_textures[i][j][k].x;
-                textures[((i*10+j)*numVertices+k)*2+1] = block_textures[i][j][k].y;
+                textures[((i*m_minemap->GetColums()+j)*numVertices+k)*2] = block_textures[i][j][k].x;
+                textures[((i*m_minemap->GetColums()+j)*numVertices+k)*2+1] = block_textures[i][j][k].y;
             }
         }
     }
@@ -179,14 +180,14 @@ void Display::UpdateDrawing()
         for(int j=0;j<mineMap[i].size();++j) {
             for(int k=0;k<numVertices;++k) {
                 if(mineMap[i][j] == MineSymbol::BLANK) {
-                    colors[((i*10+j)*numVertices+k)*3] = 0.5f;
-                    colors[((i*10+j)*numVertices+k)*3 +1] = 0.5f;
-                    colors[((i*10+j)*numVertices+k)*3 +2] = 0.5f;
+                    colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3] = 0.5f;
+                    colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3 +1] = 0.5f;
+                    colors[((i*m_minemap->GetColums()+j)*numVertices+k)*3 +2] = 0.5f;
                 }
             }
         }
     }
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, numBlocks*numVertices*3*sizeof(float), colors.get(), GL_STATIC_DRAW);
-
+    
 }

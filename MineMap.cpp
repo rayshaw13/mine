@@ -11,10 +11,10 @@ vector<vector<int>> MineMap::directions={{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},
 
 
 MineMap::MineMap(int h, int w, int num):
-    height(h),width(w),mineNum(num),isBloom(false)
+    rows(h),colums(w),mineNum(num),isBloom(false)
 {
-    vector<char> tmp(width,MineSymbol::UNRECOVERED);
-    mineMap.assign(height, tmp);
+    vector<char> tmp(colums,MineSymbol::UNRECOVERED);
+    mineMap.assign(rows, tmp);
     GenerateMap();
 }
 
@@ -152,11 +152,11 @@ int MineMap::GetRecovered()
 }
 int MineMap::GetRows()
 {
-    return height;
+    return rows;
 }
 int MineMap::GetColums()
 {
-    return width;
+    return colums;
 }
 int MineMap::GetMineNum()
 {
